@@ -18,10 +18,11 @@
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Seleziona categoria
+                {{ this.category === '' ? 'Seleziona categoria' : this.category }}
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li v-for="c in this.categories"><a class="dropdown-item" href="#">{{ c.attributes.name }}</a></li>
+                    <li v-for="c in this.categories"><a class="dropdown-item" @click="CategoryFilter($event, c.attributes.name)">{{ c.attributes.name }}</a></li>
+                    <li v-if="this.category !== ''"><a class="dropdown-item" @click="CategoryFilter($event, '')"> Nessun categoria</a></li>
                 </ul>
             </li>
             <li v-if="this.userStore.logged" class="nav-item dropdown">
@@ -55,7 +56,9 @@
                 isHome: Boolean,
                 isLogin: Boolean,
                 isSignup: Boolean,
-                searchString:''
+                searchString:'',
+                category:'',
+                searchStore:''
             }
         },
         props:{
@@ -71,7 +74,12 @@
         },
         async created(){
             this.categories = await this.fetchCategories();
+            
             this.userStore = useUserStore();
+            this.searchStore = useSearchStore();
+
+            this.searchString = this.searchStore.search;
+            this.category = this.searchStore.category;
         },
         methods:{
             async fetchCategories(){
@@ -113,6 +121,15 @@
                 const searchStore = useSearchStore();
 
                 searchStore.$patch({ search:this.searchString });
+            },
+            CategoryFilter(e, cat){
+                e.preventDefault();
+
+                this.category = cat
+
+                const searchStore = useSearchStore();
+
+                searchStore.$patch({ category:cat });
             }
         },
     }

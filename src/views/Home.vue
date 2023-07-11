@@ -22,29 +22,30 @@
             }
         },
         async created(){
-            this.listings = await this.getListings();
+            this.filterListings(this.searchStore)
 
             await this.searchStore.$subscribe(async (mutation, state) => {
-                console.log('user searched something')
-                console.log(mutation, state)
-                
-                const ls = await this.getListings();
-
-                console.log(ls)
-
-                this.listings = ls.filter( l => l.title.includes(state.search))
-                
-                console.log(state.search)
+                this.filterListings(state)
             })
         },
         methods:{
             async getListings(){
-                const res = await fetch("http://localhost:1337/api/listings?populate=images")
+                const res = await fetch("http://localhost:1337/api/listings?populate=images,category")
                 
                 const response = await res.json();
 
+                console.log(response)
+
                 return response.data;
             },
+            async filterListings(state){
+                const ls = await this.getListings();
+
+                console.log(ls[0].attributes.category)
+
+                this.listings = ls.filter( l => l.attributes.title.includes(state.search) && 
+                (state.category === '' || l.attributes.category.data.attributes.name === state.category))
+            }
         },
         mounted() {
             try{

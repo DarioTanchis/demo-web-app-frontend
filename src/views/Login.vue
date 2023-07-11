@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="pt-1 mb-4">
-                            <button class="btn btn-dark btn-lg btn-block" type="button" @click="registerUser">Accedi</button>
+                            <button class="btn btn-dark btn-lg btn-block" type="button" @click="login">Accedi</button>
                         </div>
 
                         <!--<a class="small text-muted" href="#!">Forgot password?</a>-->  
@@ -72,28 +72,26 @@
         async login(e) {
             e.preventDefault();
             
-            const requestOptions = {
-                method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    identifier: this.email,
-                    password: this.password
-                })
-            };
-            const res = await fetch("http://localhost:1337/api/auth/local", requestOptions);
-            const loginResponse = await res.json();
-            
-            console.log(loginResponse);
-            if(loginResponse.status === 200){ //200 is the ok status response
-                const userStore = useUserStore();
+            try{
+                const res = await this.axios.post(`http://localhost:1337/api/auth/local`, {
+                    "identifier": this.identifier,
+                    "password": this.password
+                });
 
-                userStore.$patch({ jwt:loginResponse.jwt, name: loginResponse.user.username })
-                
+                const { jwt, user } = res.data
+
+                const userStore = useUserStore()
+
+                userStore.$patch({ jwt:jwt, name: user.username })
+
                 router.push({
                     name: "home",
                 });
-            } else{
-                alert("Login non riuscito, credenziali errate");
+            }
+            catch(err){
+                console.log(err)
+
+                alert("Login non riuscito");
             }
         },
         goToSignup(e){

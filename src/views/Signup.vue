@@ -31,10 +31,13 @@
                             </div>
                         </div>
 
+                        <div v-if="alreadyTakenError" id="usernameEmailError">
+                            Username o email già registrati
+                        </div>
                         <div class="form-outline mb-4">
                             <label class="form-label" for="usernameInput">Username</label>
                             <input type="text" id="usernameInput" aria-describedby="usernameFeedback" class="form-control form-control-lg" 
-                            :class="this.submitted ? (this.usernameError === true ? 'is-invalid' : 'is-valid') : '' " v-model="this.username"/>
+                            :class="this.submitted ? (this.usernameError === true || this.alreadyTakenError === true ? 'is-invalid' : 'is-valid') : '' " v-model="this.username"/>
                             <div id="usernameFeedback" class="invalid-feedback">
                                 Username già registrato o formato scorretto.
                             </div>
@@ -43,7 +46,7 @@
                         <div class="form-outline mb-4">
                             <label class="form-label" for="emailInput">Email</label>
                             <input type="" id="emailInput" aria-describedby="emailFeedback" class="form-control form-control-lg" 
-                            :class="this.submitted ? (this.emailError === true ? 'is-invalid' : 'is-valid') : ''" v-model="this.email"/>
+                            :class="this.submitted ? (this.emailError === true || this.alreadyTakenError === true ? 'is-invalid' : 'is-valid') : ''" v-model="this.email"/>
                             <div id="emailFeedback" class="invalid-feedback">
                                 Email già registrata o formato scorretto.
                             </div>
@@ -95,6 +98,7 @@
                 emailError: false,
                 usernameError: false,
                 passwordError: false,
+                alreadyTakenError: false,
                 submitted: false
             }
         },
@@ -119,33 +123,39 @@
 
                 try{
                     const res = await fetch('http://localhost:1337/api/auth/local/register', requestOptions);
-                
-                    if(res.ok){
-                        const data = await res.json()
+                    const data = await res.json()
 
+                    if(res.ok){
                         const userStore = useUserStore();
 
-                        userStore.$patch({ jwt:loginResponse.jwt, name: loginResponse.user.username })        
+                        userStore.$patch({ jwt: data.jwt, name: data.user.username })        
 
                         router.push({
                             name:"home",
                         })
                     }else{
                         alert("Errore nella registrazione")
-                        
-                        const data = await res.json()
 
-                        const errors = data.error.details.errors;
+                        if(data.error.details.error === undefined){
+                            this.alreadyTakenError = data.error.message.includes('Email')
 
-                        this.passwordError = false;
-                        this.emailError = false;
-                        this.usernameError = false;
+                            alert("L'username o l'email sono già utilizzati!")
+                        }
+                        else{
+                            const errors = data.error.details.errors;
 
-                        console.log(errors.length)
-                        for(let i = 0; i < errors.length; i++){
-                            this.passwordError = this.passwordError || (errors[i].path.length > 0 && errors[i].path.indexOf('password') !== -1); //If the error is not set already and it is found in the path of the received errors
-                            this.emailError = this.emailError || (errors[i].path.length > 0 && errors[i].path.indexOf('email') !== -1); 
-                            this.usernameError = this.usernameError || (errors[i].path.length > 0 && errors[i].path.indexOf('username') !== -1); 
+                            console.log(errors)
+
+                            this.passwordError = false;
+                            this.emailError = false;
+                            this.usernameError = false;
+
+                            console.log(errors.length)
+                            for(let i = 0; i < errors.length; i++){
+                                this.passwordError = this.passwordError || (errors[i].path.length > 0 && errors[i].message.includes('password')); //If the error is not set already and it is found in the path of the received errors
+                                this.emailError = this.emailError || (errors[i].path.length > 0 && errors[i].message.includes('email')); 
+                                this.usernameError = this.usernameError || (errors[i].path.length > 0 && errors[i].message.includes('username')); 
+                            }
                         }
 
                         this.submitted = true;
@@ -176,5 +186,10 @@
 
 #mycard{
     width: 10rem;
+}
+
+#usernameEmailError{
+    color: red;
+    margin-bottom: 20px;
 }
 </style>
