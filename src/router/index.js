@@ -4,6 +4,7 @@ import Home from '@/views/Home.vue'
 import Signup from '@/views/Signup.vue'
 import Login from '@/views/Login.vue'
 import ViewListing from '@/views/ViewListing'
+import InsertListing from '@/views/InsertListing'
 
 const routes = [{
     path: '/',
@@ -21,9 +22,14 @@ const routes = [{
     component: Signup
   },
   {
-    path: '/viewListing',
+    path: '/viewListing/:id',
     name: 'viewListing',
     component: ViewListing
+  },
+  {
+    path: '/insertListing',
+    name: 'insertListing',
+    component: InsertListing
   }
   ];
 

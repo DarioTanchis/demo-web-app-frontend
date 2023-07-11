@@ -1,13 +1,13 @@
 <template>
-    <Listings v-bind:listingsData="this.listings"/>
-    {{ console.log(this.jwt === undefined || this.jwt === '' ? "Not logged" : "Logged")  }}
+    <main>
+        <Listings v-bind:listingsData="this.listings"/>
+    </main>
 </template>
 
 <script>
     import Listings from "@/components/Listings"
     import { useUserStore } from "@/stores/user"
     import { useSearchStore } from "@/stores/search"
-    import { storeToRefs } from "pinia"
 
     export default{
         name: 'Home',

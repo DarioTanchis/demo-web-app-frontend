@@ -1,7 +1,18 @@
 <template>
-    <div class="listings">
+    <div class="album py-5 bg-body-tertiary">
+
+        <div class="container text-center">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 align-items-start">
+                <ListingPreview v-for="l in this.listingsData" v-bind:listing="l"/>
+            </div>
+        </div>
+    </div>
+    <!--
+<div class="listings">
         <ListingPreview v-for="l in this.listingsData" v-bind:listing="l"/>
     </div>
+    -->
+    
 </template>
 
 <script>

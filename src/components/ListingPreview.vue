@@ -1,13 +1,17 @@
 <template>
-    <div @click="viewListing" class="listing">
-        <img class="thumbnail" v-if="this.listing.attributes.images === undefined || this.listing.attributes.images.data === null" 
-        src="https://www.vectorstock.com/royalty-free-vectors/default-vectors" >
-        <img class="thumbnail" v-else :src="'http://localhost:1337' + this.listing.attributes.images.data[0].attributes.url" 
-        alt="https://www.vectorstock.com/royalty-free-vectors/default-vectors"> 
-        
-        <h2>{{ this.listing.attributes.title }}</h2>
-        <p>{{ this.listing.attributes.price === 0 ? "Gratis": this.listing.attributes.price }}</p>    
+    <div class="col">
+        <div @click="viewListing" class="card shadow-sm">
+            <img class="bd-placeholder-img card-img-top"  v-if="this.listing.attributes.images === undefined || this.listing.attributes.images.data === null"
+             src="https://www.vectorstock.com/royalty-free-vectors/default-vectors" width="100%" height="225" xmlns="" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="true">
+             <img class="bd-placeholder-img card-img-top"  v-else :src="'http://localhost:1337' + this.listing.attributes.images.data[0].attributes.url"  width="100%" height="225" 
+             xmlns="" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="true">
+            <rect width="100%" height="100%" fill="#55595c"></rect>
+            <div class="card-body">
+                <p class="card-text">{{ this.listing.attributes.title }}</p>
+            </div>
+        </div>
     </div>
+        
 </template>
 
 <script>
@@ -20,7 +24,9 @@
             viewListing(e){
                 e.preventDefault();
 
-                this.$router.push({name: "viewListing", params:{ "listing":this.listing }})
+                console.log("listing:", this.listing)
+
+                this.$router.push({ name:"viewListing", params:{ "id":this.listing.id }  })
             }
         }
     }
