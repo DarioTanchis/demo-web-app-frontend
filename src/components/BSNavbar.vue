@@ -57,6 +57,7 @@
     import router from '@/router';
     import { useUserStore } from "@/stores/user";
     import { useSearchStore } from '@/stores/search';
+    import { useCategoriesStore } from '@/stores/categories'
 
     export default{
         name:"BSNavbar",
@@ -67,6 +68,7 @@
                 isHome: Boolean,
                 isLogin: Boolean,
                 isSignup: Boolean,
+                isInsertListing: Boolean,
                 searchString:'',
                 category:'',
                 searchStore:''
@@ -81,11 +83,15 @@
                 this.isHome = this.$route.name === 'home';
                 this.isLogin = this.$route.name === 'login';
                 this.isSignup = this.$route.name === 'signup';
+                this.isInsertListing = this.$route.name === 'insertListing'
             }   
         },
         async created(){
             this.categories = await this.fetchCategories();
             
+            console.log(this.categories)
+            useCategoriesStore().$patch( {categories: this.categories} )
+
             this.userStore = useUserStore();
             this.searchStore = useSearchStore();
 

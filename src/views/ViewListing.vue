@@ -6,7 +6,7 @@
                 src="https://www.vectorstock.com/royalty-free-vectors/default-vectors" alt="Card image cap">
                 <div v-else id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                     <div v-for="(img, index) in this.listing.images.data" class="carousel-inner">
-                        <div class="carousel-item" :class=" index===this.index ? 'active' : ''">
+                        <div class="carousel-item" :class=" index === this.index ? 'active' : ''">
                             <img class="d-block card-img-top" :src="'http://localhost:1337'+img.attributes.url">
                         </div>
                     </div>
@@ -19,7 +19,7 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="sr-only">Next</span>
                     </a>
-                    </div>
+                </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col">
@@ -77,9 +77,12 @@
             prevImage(e){
                 e.preventDefault();
 
+                const carouselItems = document.getElementsByClassName("carousel-item");
+
                 this.index = (this.index - 1) % carouselItems.length;
 
-                console.log(this.index)
+                if(this.index  < 0)
+                    this.index = carouselItems.length - 1;
             }
         },
         async created(){
