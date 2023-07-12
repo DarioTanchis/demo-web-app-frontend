@@ -2,13 +2,18 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', {
   state: () => {
-    return { jwt:'',name:''
+    return { 
+      jwt:'', 
+      user: Object
     }
   },
   actions: {
   },
   getters:{
-        logged: (state) => !(state.jwt === null || state.jwt === '') 
-    },
-  persist: true
+      
+  },
+  persist: {
+    storage: sessionStorage,
+    paths: ['jwt', 'user'],
+  } 
 })

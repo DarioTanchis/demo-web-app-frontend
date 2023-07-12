@@ -78,11 +78,13 @@
                     "password": this.password
                 });
 
+                console.log("user data: ",res.data)
+
                 const { jwt, user } = res.data
 
                 const userStore = useUserStore()
 
-                userStore.$patch({ jwt:jwt, name: user.username })
+                userStore.$patch({ jwt:jwt, user:user })
 
                 router.push({
                     name: "home",

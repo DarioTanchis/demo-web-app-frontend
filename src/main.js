@@ -8,7 +8,8 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import axios from 'axios'
 import vueAxios from 'vue-axios'
 
-const pinia = createPinia().use(piniaPluginPersistedstate);
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 createApp(App)
 .use(router)

@@ -62,7 +62,5 @@
 </script>
 
 <style>
-.mainDiv{
-    position: relative;
-}
+
 </style>

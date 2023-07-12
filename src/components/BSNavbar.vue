@@ -6,15 +6,15 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link" @click="goToHome">Home<span v-if="this.isHome" class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
+                <li v-if="isSignedIn === false" class="nav-item">
                     <a class="nav-link" @click="goToLogin">Accedi<span v-if="this.isLogin" class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
+                <li v-if="isSignedIn === false" class="nav-item">
                     <a class="nav-link" @click="goToSignup">Registrati<span v-if="this.isSignup" class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item dropdown">
@@ -26,29 +26,32 @@
                         <li v-if="this.category !== ''"><a class="dropdown-item" @click="CategoryFilter($event, '')"> Nessun categoria</a></li>
                     </ul>
                 </li>
-                <li v-if="this.userStore.logged" class="nav-item dropdown">
+                <li v-if="this.isSignedIn === true" class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ userStore.name }}
+                    {{ userStore.user !== undefined ? userStore.user.username : '' }}
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                         <li><a class="dropdown-item" @click="logout">Logout</a></li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    
+                </li>
             </ul>   
-        
-            <div class="navbar-collapse collapse w-100 order-3">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-danger" @click="InsertListing">Inserisci annuncio</button>
-                    </li>
-                    <li class="nav-item">
-                        <form v-if="isHome" class="form-inline my-2 my-lg-0 search">
-                        <span><input v-model="searchString" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></span>
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" @click="this.Search">Cerca</button>
-                        </form>
+            <div class="nav-item">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"> <button type="button" class="nav-button btn btn-danger" @click="InsertListing">Inserisci annuncio</button></li>
+                    <li class="nav-item"> 
+                        <form v-if="isHome" class="form-inline">
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item"><input v-model="searchString" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></li>
+                                <li class="nav-item"><button class="btn btn-outline-success" type="submit" @click="this.Search">Cerca</button></li>
+                            </ul>
+                        </form>    
                     </li>
                 </ul>
             </div>
+            
         </div>
     </nav>
 </template>
@@ -71,7 +74,8 @@
                 isInsertListing: Boolean,
                 searchString:'',
                 category:'',
-                searchStore:''
+                searchStore:'',
+                isSignedIn: false
             }
         },
         props:{
@@ -84,6 +88,8 @@
                 this.isLogin = this.$route.name === 'login';
                 this.isSignup = this.$route.name === 'signup';
                 this.isInsertListing = this.$route.name === 'insertListing'
+                console.log("user store", this.userStore.jwt)
+                this.isSignedIn = this.userStore.jwt !== undefined && this.userStore.jwt.length > 1
             }   
         },
         async created(){
@@ -103,8 +109,6 @@
                 const res = await fetch("http://localhost:1337/api/categories")
 
                 const data = await res.json();
-
-                console.log(data);
 
                 return data.data;
             },
@@ -129,6 +133,8 @@
             },
             logout(e){
                 e.preventDefault();
+
+                this.isSignedIn = false
 
                 this.userStore.$patch({jwt:'',name:''})
             },
@@ -158,15 +164,7 @@
 </script>
 
 <style>
-    .search{
-        display: flex;
-        flex-direction: row;
-        position: absolute;
-        right: 0;
-        margin-right: 20px;
-    }
-
-    .search > * {
-        margin-right: 10px;
+    .nav-item{
+        margin: 0 0 0 .5rem;
     }
 </style>
