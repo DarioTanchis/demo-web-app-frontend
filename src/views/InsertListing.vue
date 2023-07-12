@@ -128,22 +128,32 @@
             async submit(e){
                 e.preventDefault();
 
-                const formData = new FormData();
-                
-                this.images.forEach(img => {
-                    formData.append(`files`, img)
-                })
-
-                const resImages = await axios.post("http://localhost:1337/api/upload", formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }})
-
-                this.images = []
-                resImages.data.forEach( (el) => this.images.push(el.id) )
-
                 let jsonImages = [];
-                this.images.forEach( (img) =>  jsonImages.push({ id:img }))
+
+                if(this.images.length > 0){
+                    const formData = new FormData();
+                
+                    this.images.forEach(img => {
+                        formData.append(`files`, img)
+                    })
+
+                    try{
+                        const resImages = await axios.post("http://localhost:1337/api/upload", formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' }})
+
+                        this.images = []
+                        resImages.data.forEach( (el) => this.images.push(el.id) )
+
+                        this.images.forEach( (img) =>  jsonImages.push({ id:img }))
+                    }catch(err){
+                        console.log("Something wrong in image upload");
+                        console.log(err)
+                    }
+                }
 
                 try{
+                    const catId = useCategoriesStore().categories.filter( (el) => el.attributes.name === this.category )[0].id
+
                     const resListing = await axios.post("http://localhost:1337/api/listings", 
                     {data:{
                         title: this.title,
@@ -152,6 +162,7 @@
                         phone: this.phone,
                         price: this.price,
                         images: jsonImages,
+                        category: catId
                     }},
                     {headers:{               
                         Authorization:
@@ -159,9 +170,24 @@
                         }
                     });
 
+                    console.log(resListing.data.data.id)
+/*
+                    const resCategory = await axios.post(`http://localhost:1337/api/listings/${resListing.data.data.id}`, 
+                    {data:{
+                        category:{
+                            connect: [this.category]
+                        }
+                    }},
+                    {headers:{               
+                        Authorization:
+                        `Bearer ${useUserStore().jwt}`
+                        }
+                    });*/
+
                     alert("Annuncio inserito correttamente")
                 }catch(err){
                     alert("Errore nell'inserimento dell'annuncio")
+                    console.log(err)
                 }
             },
             readAndPreview(file) {
@@ -183,8 +209,10 @@
 
                 this.category = cat;
             },
-            insertCat(listingId){
-                axios.put("http://localhost:1337/api/listings", 
+            async insertCat(listingId){
+                axios.get("http://localhost:1337/api/categories?populate=")
+                
+                axios.put("http://localhost:1337/api/categories", 
                     {headers:{               
                         Authorization:
                         `Bearer ${useUserStore().jwt}`
