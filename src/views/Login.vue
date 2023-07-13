@@ -84,7 +84,7 @@
 
                 const userStore = useUserStore()
 
-                userStore.$patch({ jwt:jwt, user:user })
+                userStore.setUser(jwt, user)
 
                 router.push({
                     name: "home",

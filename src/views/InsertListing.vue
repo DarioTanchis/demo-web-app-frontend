@@ -2,7 +2,7 @@
     <main>
         <div class="container align-items-start">
             <div class="card" style="width: 50rem;">
-                <div class="card-body">
+                <div v-if="isLogged" class="card-body">
                     <form style="">
                         <div class="form-group mb-3">
                             <label for="formTitle" class="form-label">Titolo</label>
@@ -61,6 +61,9 @@
                         </div>
                     </form>
                 </div>
+                <div class="card-body" v-else>
+                    <h2 style="color: red;">Non puoi pubblicare un annuncio a meno che tu non sia autenticato</h2>
+                </div>
             </div>
         </div>
     </main>
@@ -76,7 +79,6 @@
         data(){
             return{
                 imageIndex:0,
-            
                 title:'',
                 description:'',
                 price:0,
@@ -86,10 +88,13 @@
                 category:'',
                 images:[],
                 categoriesStore: Object,
+                isLogged: false
             }
         },
         created(){
             this.categoriesStore = useCategoriesStore();
+
+            this.isLogged = useUserStore !== null && useUserStore().jwt !== undefined && useUserStore().jwt !== '';
         },
         methods: {
             nextImage(e){
@@ -154,37 +159,33 @@
                 try{
                     const catId = useCategoriesStore().categories.filter( (el) => el.attributes.name === this.category )[0].id
 
+                    const userId = useUserStore().user.id
+                    console.log(userId)
+
                     const resListing = await axios.post("http://localhost:1337/api/listings", 
-                    {data:{
-                        title: this.title,
-                        description: this.description,
-                        email: this.email,
-                        phone: this.phone,
-                        price: this.price,
-                        images: jsonImages,
-                        category: catId
-                    }},
+                    {
+                        data:{
+                            title: this.title,
+                            description: this.description,
+                            email: this.email,
+                            phone: this.phone,
+                            price: this.price,
+                            images: jsonImages,
+                            category: catId,
+                            user: userId
+                        }
+                },
                     {headers:{               
                         Authorization:
                         `Bearer ${useUserStore().jwt}`
                         }
                     });
 
-                    console.log(resListing.data.data.id)
-/*
-                    const resCategory = await axios.post(`http://localhost:1337/api/listings/${resListing.data.data.id}`, 
-                    {data:{
-                        category:{
-                            connect: [this.category]
-                        }
-                    }},
-                    {headers:{               
-                        Authorization:
-                        `Bearer ${useUserStore().jwt}`
-                        }
-                    });*/
+                    console.log("listing id",resListing.data.data.id)
 
-                    alert("Annuncio inserito correttamente")
+                    if(!alert("Annuncio inserito correttamente")){
+                        this.$router.push( {path:`/viewListing/${resListing.data.data.id}`} )
+                    }
                 }catch(err){
                     alert("Errore nell'inserimento dell'annuncio")
                     console.log(err)
@@ -209,16 +210,7 @@
 
                 this.category = cat;
             },
-            async insertCat(listingId){
-                axios.get("http://localhost:1337/api/categories?populate=")
-                
-                axios.put("http://localhost:1337/api/categories", 
-                    {headers:{               
-                        Authorization:
-                        `Bearer ${useUserStore().jwt}`
-                        }
-                    })
-            }
+            
         }
     }
 </script>

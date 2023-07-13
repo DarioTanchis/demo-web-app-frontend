@@ -3,11 +3,11 @@
         <div class="container align-items-start">
             <div class="card" style="width: 40rem;">
                 <img class="card-img-top" v-if="this.listing.images === undefined || this.listing.images.data === null"
-                src="https://www.vectorstock.com/royalty-free-vectors/default-vectors" alt="Card image cap">
+                src="https://italiancinemaaudiences.org/wp-content/themes/trend/assets/img/empty/424x500.png" style="max-height: 30rem; white-space:nowrap" alt="Card image cap">
                 <div v-else id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                     <div v-for="(img, index) in this.listing.images.data" class="carousel-inner">
                         <div class="carousel-item" :class=" index === this.index ? 'active' : ''">
-                            <img class="d-block card-img-top" :src="'http://localhost:1337'+img.attributes.url">
+                            <img class="d-block card-img-top" style="max-height: 45rem;" :src="'http://localhost:1337'+img.attributes.url">
                         </div>
                     </div>
                     <a v-if="this.listing.images.data.length > 1" class="carousel-control-prev" @click="prevImage" role="button" data-slide="prev">
@@ -21,23 +21,35 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                            <h2>{{ listing.title }}</h2>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <h2 class="align-text-bottom">{{ listing.title }}</h2>
+                            </div>
                         </div>
-                        <div class="col">
-                            <h2>{{ listing.price === 0 ? 'Gratis' : listing.price + '€' }}</h2>
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="align-text-bottom">{{ listing.price === 0 ? 'Gratis' : listing.price + '€' }}</h5>
+                            </div>
                         </div>
-                    </div>
-                   
-                    <p class="card-text">{{ listing.description }}</p>
-                    <h4 v-if="this.listing.email !== null || this.listing.phone !== null">Contatti</h4>
-                    <div class="row">
-                        <div v-if="this.listing.email" class="col">
-                            {{ this.listing.email }}
-                        </div>
-                        <div v-if="this.listing.phone" class="col">
-                            {{ this.listing.phone }}
+
+                        <h5 class="mt-3">Descrizione</h5>
+                        <p class="card-text">{{ listing.description }}</p>
+
+                        <h4 class="mt-3" v-if="this.listing.email !== null || this.listing.phone !== null">Contatti</h4>
+                        <div class="row ">
+                            <div v-if="this.listing.email" class="col-md-auto">
+                                {{ this.listing.email }}
+                            </div>
+                            <div class="col-md-auto">
+                                <div class="vr">
+
+                                </div>
+                            </div>
+                            <div v-if="this.listing.phone" class="col-md-auto">
+                                {{ this.listing.phone }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -47,8 +59,6 @@
 </template>
 
 <script>
-    import { useRoute } from 'vue-router';
-
     export default{
         name: "ViewListing",
         data(){
@@ -98,4 +108,5 @@
             margin-bottom: 10px; /* Added */
             margin-top: 5rem;
     }
+
 </style>

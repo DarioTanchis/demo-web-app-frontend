@@ -11,5 +11,4 @@ export const useListingsStore = defineStore('listings', {
   getters:{
         
     },
-  persist: false
 })

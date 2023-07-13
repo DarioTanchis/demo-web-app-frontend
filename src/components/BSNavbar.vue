@@ -17,7 +17,7 @@
                 <li v-if="isSignedIn === false" class="nav-item">
                     <a class="nav-link" @click="goToSignup">Registrati<span v-if="this.isSignup" class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item dropdown">
+                <li v-if="this.$route.name === 'home'" class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ this.category === '' ? 'Seleziona categoria' : this.category }}
                     </a>
@@ -40,7 +40,9 @@
             </ul>   
             <div class="nav-item">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"> <button type="button" class="nav-button btn btn-danger" @click="InsertListing">Inserisci annuncio</button></li>
+                    <li v-if="this.isSignedIn && this.isHome" class="nav-item"> <button type="button" class="nav-button btn btn-danger" @click="ViewOwnListings">
+                        {{ searchStore.viewOwnListings === true ? 'Indietro' : 'Visualizza i tuoi annunci' }}</button></li>
+                    <li v-if="this.isSignedIn" class="nav-item"> <button type="button" class="nav-button btn btn-danger" @click="InsertListing">Inserisci annuncio</button></li>
                     <li class="nav-item"> 
                         <form v-if="isHome" class="form-inline">
                             <ul class="navbar-nav mr-auto">
@@ -67,39 +69,37 @@
         data(){
             return{
                 categories: Array,
-                userStore: Object,
+                userStore: useUserStore(),
                 isHome: Boolean,
                 isLogin: Boolean,
                 isSignup: Boolean,
                 isInsertListing: Boolean,
                 searchString:'',
                 category:'',
-                searchStore:'',
+                searchStore:useSearchStore(),
                 isSignedIn: false
             }
         },
-        props:{
-        },
         watch: {
             '$route': function (from, to) {
-                console.log("new route set");
+                if(from !== to){
+                    console.log("new route set");
 
-                this.isHome = this.$route.name === 'home';
-                this.isLogin = this.$route.name === 'login';
-                this.isSignup = this.$route.name === 'signup';
-                this.isInsertListing = this.$route.name === 'insertListing'
-                console.log("user store", this.userStore.jwt)
-                this.isSignedIn = this.userStore.jwt !== undefined && this.userStore.jwt.length > 1
+                    this.isHome = this.$route.name === 'home';
+                    this.isLogin = this.$route.name === 'login';
+                    this.isSignup = this.$route.name === 'signup';
+                    this.isInsertListing = this.$route.name === 'insertListing'
+                    
+                    this.isSignedIn = this.userStore.jwt !== undefined && this.userStore.jwt.length > 1
+                }else{
+                    console.log("page refresh")
+                }
             }   
         },
         async created(){
             this.categories = await this.fetchCategories();
             
-            console.log(this.categories)
             useCategoriesStore().$patch( {categories: this.categories} )
-
-            this.userStore = useUserStore();
-            this.searchStore = useSearchStore();
 
             this.searchString = this.searchStore.search;
             this.category = this.searchStore.category;
@@ -136,28 +136,29 @@
 
                 this.isSignedIn = false
 
-                this.userStore.$patch({jwt:'',name:''})
+                this.userStore.$patch({jwt:'',user:null})
             },
             Search(e){
                 e.preventDefault();
 
-                const searchStore = useSearchStore();
-
-                searchStore.$patch({ search:this.searchString });
+                this.searchStore.setSearch(this.searchString)
             },
             CategoryFilter(e, cat){
                 e.preventDefault();
 
                 this.category = cat
 
-                const searchStore = useSearchStore();
-
-                searchStore.$patch({ category:cat });
+                this.searchStore.setCat(cat);
             },
             InsertListing(e){
                 e.preventDefault();
 
                 this.$router.push( { name:"insertListing" } )
+            },
+            ViewOwnListings(e){
+                e.preventDefault();
+
+                this.searchStore.setViewOwnListings();
             }
         },
     }

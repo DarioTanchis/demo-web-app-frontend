@@ -1,13 +1,14 @@
 <template>
     <main>
+        {{ console.log("listings data in home", this.listings) }}
         <Listings v-bind:listingsData="this.listings"/>
     </main>
 </template>
 
 <script>
     import Listings from "@/components/Listings"
-    import { useUserStore } from "@/stores/user"
     import { useSearchStore } from "@/stores/search"
+    import { useUserStore } from "@/stores/user"
 
     export default{
         name: 'Home',
@@ -18,15 +19,28 @@
             return{
                 jwt:'',
                 listings: [],
-                searchStore: useSearchStore()
+                searchStore: useSearchStore(),
+                userStore: useUserStore()
             }
         },
         async created(){
-            this.filterListings(this.searchStore)
+            try{
+                this.jwt = this.userStore.jwt;
+            }
+            catch(err){
+                console.log(err)
+            }
+        
+            await this.filterListings(this.searchStore);
+
+            console.log(this.searchStore)
+            console.log("user store", this.userStore.user)
 
             await this.searchStore.$subscribe(async (mutation, state) => {
-                this.filterListings(state)
+                console.log("search state change")
+                await this.filterListings(state)
             })
+        
         },
         methods:{
             async getListings(){
@@ -34,28 +48,17 @@
                 
                 const response = await res.json();
 
-                console.log(response)
-
                 return response.data;
             },
             async filterListings(state){
                 const ls = await this.getListings();
+                console.log("listings before filter: ", ls)
 
-                console.log(ls[0].attributes.category)
+                this.listings = ls.filter( l => state === undefined || (l.attributes.title.includes(state.search) && 
+                (state.category === '' || l.attributes.category.data.attributes.name === state.category)))
 
-                this.listings = ls.filter( l => l.attributes.title.includes(state.search) && 
-                (state.category === '' || l.attributes.category.data.attributes.name === state.category))
-            }
-        },
-        mounted() {
-            try{
-                const userStore = useUserStore();
-
-                this.jwt = userStore.jwt;
-            }
-            catch(err){
-                
-            }
+                console.log("listings after filter", this.listings)
+            },
         },
     }
     

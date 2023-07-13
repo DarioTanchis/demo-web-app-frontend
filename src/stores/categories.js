@@ -10,6 +10,5 @@ export const useCategoriesStore = defineStore('categories', {
   },
   getters:{
         
-    },
-  persist: true
+  },
 })

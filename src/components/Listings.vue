@@ -3,6 +3,7 @@
 
         <div class="container text-center">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 align-items-start">
+                {{ console.log("listings in Listings.vue", this.listingsData) }}
                 <ListingPreview v-for="l in this.listingsData" v-bind:listing="l"/>
             </div>
         </div>
