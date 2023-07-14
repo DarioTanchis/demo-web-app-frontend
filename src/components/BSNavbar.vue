@@ -136,7 +136,7 @@
 
                 this.isSignedIn = false
 
-                this.userStore.$patch({jwt:'',user:null})
+                this.userStore.Logout();
             },
             Search(e){
                 e.preventDefault();

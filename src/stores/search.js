@@ -37,7 +37,7 @@ export const useSearchStore = defineStore('search', {
       this.updateLocalStorage();
     },
     updateLocalStorage(){
-      localStorage.setItem('search-store', `{"search":"${this.search}", "category":"${this.category}, "viewOwnListings":"${this.viewOwnListings}"}`)
+      localStorage.setItem('search-store', `{"search":"${this.search}", "category":"${this.category}", "viewOwnListings":"${this.viewOwnListings}"}`)
     }
   }
 })
