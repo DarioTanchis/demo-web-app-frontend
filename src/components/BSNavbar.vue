@@ -40,7 +40,7 @@
             </ul>   
             <div class="nav-item">
                 <ul class="navbar-nav mr-auto">
-                    <li v-if="this.isSignedIn && this.isHome" class="nav-item"> <button type="button" class="nav-button btn btn-danger" @click="ViewOwnListings">
+                    <li v-if="this.isSignedIn && this.isHome" class="nav-item"> <button type="button" class="nav-button btn btn-primary" @click="ViewOwnListings">
                         {{ searchStore.viewOwnListings === true ? 'Indietro' : 'Visualizza i tuoi annunci' }}</button></li>
                     <li v-if="this.isSignedIn" class="nav-item"> <button type="button" class="nav-button btn btn-danger" @click="InsertListing">Inserisci annuncio</button></li>
                     <li class="nav-item"> 

@@ -44,18 +44,25 @@
         },
         methods:{
             async getListings(){
-                const res = await fetch("http://localhost:1337/api/listings?populate=images,category")
-                
-                const response = await res.json();
+                //const res = await fetch("http://localhost:1337/api/listings?populate=images,category,madeby")
+                const res = await this.axios.get("http://localhost:1337/api/listings?populate=images,category,madeby", 
+                { headers: { Authorization: "Bearer " + this.userStore.jwt } })
 
-                return response.data;
+                //const response = await res.json();
+
+                console.log(res)
+
+                return res.data.data;
             },
             async filterListings(state){
                 const ls = await this.getListings();
                 console.log("listings before filter: ", ls)
 
+                console.log(this.userStore.user.id)
+
                 this.listings = ls.filter( l => state === undefined || (l.attributes.title.includes(state.search) && 
-                (state.category === '' || l.attributes.category.data.attributes.name === state.category)))
+                (state.category === '' || l.attributes.category.data.attributes.name === state.category) &&
+                (state.viewOwnListings === false ? l.attributes.madeby.data.id !== this.userStore.user.id : l.attributes.madeby.data.id === this.userStore.user.id)))
 
                 console.log("listings after filter", this.listings)
             },

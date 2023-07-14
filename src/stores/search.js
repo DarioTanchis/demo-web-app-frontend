@@ -6,7 +6,7 @@ export const useSearchStore = defineStore('search', {
     return { 
         search: '',
         category: '',
-        viewOwnListings: '',
+        viewOwnListings: false,
     }
   },
   actions:{
@@ -32,12 +32,15 @@ export const useSearchStore = defineStore('search', {
       this.updateLocalStorage();
     },
     setViewOwnListings(){
+      console.log("view own listings",this.viewOwnListings)
       this.viewOwnListings = !this.viewOwnListings;
+
+      console.log("view own listings",this.viewOwnListings)
 
       this.updateLocalStorage();
     },
     updateLocalStorage(){
-      localStorage.setItem('search-store', `{"search":"${this.search}", "category":"${this.category}", "viewOwnListings":"${this.viewOwnListings}"}`)
+      localStorage.setItem('search-store', `{"search":"${this.search}", "category":"${this.category}", "viewOwnListings":${this.viewOwnListings}}`)
     }
   }
 })
